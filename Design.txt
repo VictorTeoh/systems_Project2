@@ -1,0 +1,35 @@
+Names of members in Group  : Victor Teoh, Jensen Li
+
+Description of Project : We are looking to create a server client network that allows clients to play various games agaisnt each other
+
+Usage : Clients will connect with the server and host or join games with one another.
+
+Technical Design :
+
+Networking - Be able to play with clients on the network
+Shared memory - The game board can be in shared memory between clients and subservers
+Pipes : Through piping connections between server and clients will be established
+Signals : Dealing with clients that quit
+Processes : The server will fork off subservers for the games and be an intermittetary communicator
+
+Breakdown of jobs :
+
+Victor - Server to client connection
+Jensen - Creating the game(s)
+
+Data Structures Used :
+2D Arrays
+
+Algorithms :
+????
+
+Timeline -
+Setup
+Game
+
+Potential Games
+Checkers
+Ultimate Tic Tac Toe
+Battleship
+Hangman-Mastermind
+
