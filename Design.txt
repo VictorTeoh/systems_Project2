@@ -29,10 +29,10 @@ Client to Client Setup(during hosting and joining games) - Whenever we learn it 
 Game SDL included - ~1 week each
 
 Potential Games
-Checkers
-Ultimate Tic Tac Toe
-Battleship
-Hangman
-Mastermind
-Connect 4
+Checkers (Will use SDL)
+Ultimate Tic Tac Toe (Will use SDL)
+Battleship (Will use SDL)
+Hangman (Will NOT use SDL)
+Mastermind (Will use SDL)
+Connect 4 (Will use SDL)
 
