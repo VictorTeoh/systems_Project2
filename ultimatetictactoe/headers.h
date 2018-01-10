@@ -14,3 +14,6 @@
 #include <sys/sem.h>
 #include <sys/socket.h>
 #include <netdb.h>
+
+#define false 0
+#define true 1
