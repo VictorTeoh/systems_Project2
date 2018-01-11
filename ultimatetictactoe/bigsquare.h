@@ -4,13 +4,12 @@
 #define p2 'o'
 #define tie '-'
 
-struct bigsquare{
+typedef struct{
   struct smallsquare _STTT[9];
   struct smallsquare _BTTT;
   int _isOver;
-  int _AI;
   char _winner;
   int _turn;
-};
+} bigsquare;
 
 
