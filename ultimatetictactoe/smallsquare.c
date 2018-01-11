@@ -1,11 +1,12 @@
 #include "smallsquare.h"
 
-void Smallsquare(smallsquare * ss){
-  smallsquare->_sttt = {0};
+smallsquare Smallsquare(){
+  smallsquare ss;
   for(int i = 0; i < 9; i++)
-    ss->_sttt[i] = ' ';
-  ss->_gameover = false;
-  ss->_winner = '-';
+    ss._sttt[i] = ' ';
+  ss._gameover = false;
+  ss._winner = '-';
+  return ss;
 }
 
 char * get_board(smallsquare * ss){
@@ -70,12 +71,12 @@ void print_board(smallsquare * ss){
   populate(ss);
   char * s1 = "             |             |            \n";
   char * s2 = " ------------+-------------+------------\n";
-  printf(s1+s1);
+  printf("%s%s",s1,s1);
   printf("      %c      |      %c      |      %c      \n", ss->_sttt[0],ss->_sttt[1],ss->_sttt[2]);
-  printf(s1+s1+s2+s1+s1);
+  printf("%s%s%s%s%s",s1,s1,s2,s1,s1);
   printf("      %c      |      %c      |      %c      \n",ss->_sttt[3],ss->_sttt[4],ss->_sttt[5]);
-  printf(s1+s1+s2+s1+s1);
+  printf("%s%s%s%s%s",s1,s1,s2,s1,s1);
   printf("      %c      |      %c      |      %c      \n",ss->_sttt[6],ss->_sttt[7],ss->_sttt[8]);
-  printf(s1+s1);
+  printf("%s%s",s1,s1);
   unpopulate(ss);
 }

@@ -6,7 +6,7 @@ typedef struct{
   int _gameover;
 } smallsquare;
 
-void SmallSquare(smallsquare * ss);
+void SmallSquare();
 char get_index(smallsquare * ss, int val);
 char get_winner(smallsquare * ss);
 void populate(smallsquare * ss);
