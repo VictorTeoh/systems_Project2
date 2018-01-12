@@ -9,30 +9,30 @@ smallsquare Smallsquare(){
   return ss;
 }
 
-char * get_board(smallsquare * ss){
+char * get_board(smallsquare ss){
   return ss->_sttt;
 }
     
-char get_index(smallsquare * ss, int val){
+char get_index(smallsquare ss, int val){
   return ss->_sttt[val];
 }
 
-char get_winner(smallsquare * ss){
+char s_get_winner(smallsquare ss){
   return ss->_winner = ss->_sttt[0];
 }
 
-void populate(smallsquare * ss){
+void populate(smallsquare ss){
   for(int i = 0; i < 9; i++)
     if(!(ss->_sttt[i] == 'x' || ss->_sttt[i] == 'o' || ss->_sttt[i] == '-'))
       ss->_sttt[i] = (char)(i+'1');
 }
-void unpopulate(smallsquare * ss){
+void unpopulate(smallsquare ss){
   for(int i = 0; i < 9; i++)
     if(!(ss->_sttt[i] == 'x' || ss->_sttt[i] == 'o' || ss->_sttt[i] == '-'))
       ss->_sttt[i] = ' ';
 }
     
-int is_over(smallsquare * ss){
+int s_is_over(smallsquare ss){
   populate(ss);
   if((ss->_sttt[0] == ss->_sttt[1] && ss->_sttt[1] == ss->_sttt[2]) ||
      (ss->_sttt[0] == ss->_sttt[3] && ss->_sttt[3] == ss->_sttt[6]) ||
@@ -55,7 +55,7 @@ int is_over(smallsquare * ss){
   return ss->_gameover = true;
 }
 
-int set_winner(smallsquare * ss, char player){
+int set_winner(smallsquare ss, char player){
   if(ss->_gameover)
     ss->_winner = player;
   for (int i = 0; i < 9; i++)
@@ -63,11 +63,11 @@ int set_winner(smallsquare * ss, char player){
   return ss->_gameover = true;
 }
 
-void set_square(smallsquare * ss, int index, char player){
+void set_square(smallsquare ss, int index, char player){
   ss->_sttt[index] = player;
 }
 
-void print_board(smallsquare * ss){
+void s_print_board(smallsquare ss){
   populate(ss);
   char * s1 = "             |             |            \n";
   char * s2 = " ------------+-------------+------------\n";
