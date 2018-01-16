@@ -1,72 +1,73 @@
 #include "bigsquare.h"
 
-bigsquare BigSquare(){
-  bigsquare bs;
-  bs->_STTT = smallSquare[9];
+bigsquare * BigSquare(){
+  bigsquare * bs = malloc(sizeof(bigsquare));;
+  (*bs)._STTT = smallsquare[9];
   for(int i = 0; i < 9; i++)
-    bs->_STTT[i] = new SmallSquare();
-  bs->_BTTT = new SmallSquare();
-  bs->_isOver = false;
-  bs->_winner = '-';
-  bs->_turn = 0;
+    (*bs)._STTT[i] = Smallsquare();
+  (*bs)._BTTT = Smallsquare();
+  (*bs)._isOver = false;
+  (*bs)._winner = '-';
+  (*bs)._turn = 0;
+  return bs;
 }
 
-smallsquare * get_sboard(bigsquare bs){
-  return bs->_STTT;
+smallsquare * get_sboard(bigsquare * bs){
+  return (*bs)._STTT;
 }
 
-int get_turn(bigsquare bs){
-  return bs->_turn;
+int get_turn(bigsquare * bs){
+  return (*bs)._turn;
 }
 
-char get_player(bigsquare bs){
-  bs->_turn++; //increments turn before returning current player
-  if(bs->_turn % 2 == 1) //since turn is incremented, p1 will be 1
+char get_player(bigsquare * bs){
+  (*bs)._turn++; //increments turn before returning current player
+  if((*bs)._turn % 2 == 1) //since turn is incremented, p1 will be 1
     return p1;
   else //and p2 would be 0 instead of the opposite
     return p2;
 }
     
-smallsquare get_bboard(bigsquare bs){
-  return bs->_BTTT;
+smallsquare * get_bboard(bigsquare * bs){
+  return (*bs)._BTTT;
 }
     
-int is_over(bigsquare bs){
-  return s_is_over(bs->_BTTT);
+int is_over(bigsquare * bs){
+  return s_is_over((*bs)._BTTT);
 }
 
-char get_winner(bigsquare bs){
-  return bs->_winner;
+char get_winner(bigsquare * bs){
+  return (*bs)._winner;
 }
 
-smallsquare get_square(bigsquare bs, int index){
-  return bs->_STTT[index];
+smallsquare * get_square(bigsquare * bs, int index){
+  return (*bs)._STTT[index];
 }
     
-void set_bboard(bigsquare bs, int index, char win){
-  set_square(bs->_BTTT, index, win);
+void set_bboard(bigsquare * bs, int index, char win){
+  set_square((*bs)._BTTT, index, win);
 }
 
-int normal_turn(bigsquare bs, int index){
+int normal_turn(bigsquare * bs, int index){
   printf("Current Board\n");
-  populate(bs->_STTT[index]);
+  populate((*bs)._STTT[index]);
   print_board(bs);
-  unpopulate(bs->_STTT[index]);
-  int ans = pick_square(bs->_STTT[index]);
+  unpopulate((*bs)._STTT[index]);
+  int ans = pick_square((*bs)._STTT[index]);
   return ans;
 }
 
-int freebie(bigsquare bs){
+int freebie(bigsquare * bs){
   printf("Current Board\n");
   print_board(bs);
   printf("=====================================================\n");
   printf("You have a freebie\n");
-  s_print_board(bs->_BTTT);
-  int temp = pickSquare(bs->_BTTT);
+  s_print_board((*bs)._BTTT);
+  int temp = pick_square((*bs)._BTTT);
   return temp;
 }
 
-int pick_square(smallsquare ttt){
+int pick_square(smallsquare * ttt){
   int unused[9]; //make list of available indices
   populate(ttt);
   for(char x : ttt.getBoard()){
@@ -76,8 +77,8 @@ int pick_square(smallsquare ttt){
   }
   Scanner s = new Scanner(System.in);
   int num = 0;
-  while (!findVal(unused,num)){ //asks until player picks and available square
-    System.out.print("Please enter a numbered square!\nPick a square: "); //player picks
+  while (!find_val(unused,num)){ //asks until player picks and available square
+    printf("Please enter a numbered square!\nPick a square: "); //player picks
     while(!s.hasNextInt()){
       System.out.print("Please enter a numbered square!\nPick a square: ");
       s.next();
@@ -97,7 +98,7 @@ int find_val(int * arr, int val){
   return false;
 }
     
-void print_board(bigsquare bs){
+void print_board(bigsquare * bs){
   char * DIVIDER1 = " ---+---+--- | ---+---+--- | ---+---+--- \n";
   char * DIVIDER2 = "-------------+-------------+-------------\n";
 
@@ -107,7 +108,7 @@ void print_board(bigsquare bs){
     for(int j = 0; j < 3; j++) 
       for(int k = 0; k < 3; k++) 
 	for(int l = 0; l < 3; l++) {
-	  temp[counter] = bs->_STTT[i*3 + k].getIndex(j * 3 + l);
+	  temp[counter] = (*bs)._STTT[i*3 + k].get_index(j * 3 + l);
 	  counter++;
 	}
 	
