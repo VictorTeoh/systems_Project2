@@ -7,6 +7,7 @@ typedef struct{
 } smallsquare;
 
 smallsquare * Smallsquare();
+char * get_board(smallsquare * ss);
 char get_index(smallsquare * ss, int val);
 char s_get_winner(smallsquare * ss);
 void populate(smallsquare * ss);

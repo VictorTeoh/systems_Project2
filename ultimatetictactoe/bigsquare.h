@@ -13,7 +13,7 @@ typedef struct{
 } bigsquare;
 
 bigsquare * BigSquare();
-smallsquare * get_sboard(bigsquare * bs);
+smallsquare ** get_sboard(bigsquare * bs);
 int get_turn(bigsquare * bs);
 char get_player(bigsquare * bs);
 smallsquare * get_bboard(bigsquare * bs);
