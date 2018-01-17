@@ -67,13 +67,14 @@ void process(int * to_p, int * from_p, char * str, char * state) {
   else if(strcmp(str, "host g1") == 0){
     strcpy(str, "hosting");
     strcpy(state, "hosting");
+    host(to_p, from_p, str, state);
   }
   else if(strncmp(str, "join ", 5) == 0){
     strcpy(str, "sdsar"); // ????
     sscanf(str, "%d", to_p);
-    printf("%d\n",*to_p);
-     printf("%d\n",*to_p); 
+    printf("%d\n",*to_p); 
     sprintf(str, "fs %d", *to_p);
+    nothost(to_p, from_p, str, state);
   }
   else{
     strcpy(str, "Invalid phrase try again");
@@ -86,7 +87,7 @@ void host(int * to_client, int * from_client, char * buffer, char * state ){
   char wkp[25];
   sprintf(wkp, "%d", getpid());
   //no while loop here 
-   *from_client =  server_handshake(to_client , wkp);
+  *from_client = server_handshake(to_client , wkp); // stays here if the server is invalid?
   //change later
   read(*from_client, buffer, sizeof(buffer));
   write(*to_client, buffer, sizeof(buffer));
@@ -97,8 +98,6 @@ void host(int * to_client, int * from_client, char * buffer, char * state ){
 
 void nothost(int * to_server, int * from_server, char * buffer, char * state ){
   *from_server = client_handshake( to_server, buffer);
-
-  
 
   write(*to_server, buffer, sizeof(buffer));
   read(*from_server, buffer, sizeof(buffer));
