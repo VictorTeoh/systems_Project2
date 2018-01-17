@@ -10,9 +10,11 @@
 #ifndef NETWORKING_H
 #define NETWORKING_H
 #define ACK "HOLA"
-
-#define HANDSHAKE_BUFFER_SIZE 10
+#endif
+#ifndef BUFFER_SIZE
 #define BUFFER_SIZE 1000
+#endif
+#define HANDSHAKE_BUFFER_SIZE 10
 
 #define PP "PP"
 
@@ -20,4 +22,3 @@ int server_handshake(int *to_client, char * wkp);
 
 int client_handshake(int *to_server, char * wkp);
 
-#endif
