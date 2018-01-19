@@ -12,7 +12,7 @@ connect4 * setup(){
 }
 
 char *** get_board(connect4 * cf){
-  return cf._board;
+  return (*cf)._board;
 }
 
 char get_player(connect4 * cf){
@@ -23,8 +23,38 @@ char get_player(connect4 * cf){
     return p2;
 }
 
-char turn(connect4 * cf){
-
-
+char set(int col, int row, char player){
+  return (*cf)._board[col][row] = player;
 }
 
+char turn(connect4 * cf, int col, char player){
+  printf("Current Board\n");
+  print_board(cf);
+  char buffer[8];
+  char row;
+  while ((row = strchr((*cf)._board[col], blank)) == -1){
+    printf("Please enter an unfilled column!\nPick a column: ");
+    while( fgets(buffer, 8, stdin) ){
+      if(strlen(buffer) == 2 && ((buffer[0] - '0') <= 7 && (buffer[0] - '0') > 0))
+	break;
+      printf("Please enter an unfilled column!\nPick a column: ");
+    }
+    col = buffer[0] - '0';
+  }
+  return set(col, row, player);
+}
+
+void print_board(connect4 * cf){
+  char ans[512] = {"|"};
+  char open[16] = {" "};
+  for(int i = 0; i < 6; i++){
+    for(int j = 0; j < 7; j++)
+      sprintf(ans, "%s%s|", ans, (*cf)._board[i][j]);
+    sprintf(ans, "%s\n_______________\n", ans);
+    if(strchr((*cf)._board[i], blank) == -1)
+      sprintf(open, "%s%d ", ans, i);
+    else
+      sprintf(open, "%s  ", ans);
+  }
+  printf("%s\n",ans);
+}

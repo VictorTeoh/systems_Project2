@@ -85,7 +85,6 @@ int pick_square(smallsquare * ttt){
 	break;
       printf("Please enter a numbered square!\nPick a square: ");
     }
-    //System.out.print("Please enter a numbered square!\nPick a square: ");
     num = buffer[0] - '0';
   }
   unpopulate(ttt);
