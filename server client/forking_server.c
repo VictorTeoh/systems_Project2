@@ -1,8 +1,9 @@
 #include "networking.h"
 #include "pipe_networking.h"
 //shared memory for game hosting and then when done pipe between subservers
+//some bug with blocking
 void process(int * to_p, int * from_p, char * str, char * state);
-void subserver(int from_client);
+void subserver(int from_client, int * from_p);
 void host(int * to_client, int * from_client, char * buffer, char * state );
 void nothost(int * to_server, int * from_server, char * buffer, char * state );
 void game1 (char *s, char *state);
@@ -10,35 +11,67 @@ int main() {
 
   int listen_socket;
   int f;
-  int wkp; //the name of the pipe that you are trying to connect to
-  //which is also that subserver's pid
+  int * place;
+  int i;
+  i = -1;
+  place = &i;
   listen_socket = server_setup();
 
   while (1) {
 
     int client_socket = server_connect(listen_socket);
     f = fork();
-    if (f == 0)
-      subserver(client_socket);
+    if (f == 0){
+      subserver(client_socket, place);
+    }
     else
       close(client_socket);
   }
 }
 
-void subserver(int client_socket) {
+void subserver(int client_socket, int * from_p) {
   char buffer[BUFFER_SIZE];
   char state[100];
+  char handle[32];
   int * to_p;
-  int * from_p;
+  fd_set read_fds;
   //work in select so then the subserver knows what to do when two people input stuff and set up the client server thing so it relays information back to the other client
-  while (strcmp(state, "0") != 0 && read(client_socket, buffer, sizeof(buffer))) {
+  /* maybe later
+  read(client_socket, buffer, sizeof(buffer));
+  strcat(handle, buffer);
+  printf("%s\n", handle);
+  write(client_socket, "name saved for this session", sizeof("name saved for this session")); 
+  */
+  while (strcmp(state, "0") != 0) {
+    
+    FD_ZERO(&read_fds);
+    FD_SET(*from_p, &read_fds); //add reading pipe to fd set
+    FD_SET(client_socket, &read_fds); //add socket to fd set
 
-    printf("[subserver %d] received: [%s]\n", getpid(), buffer);
-    process(to_p, from_p, buffer, state);
-    write(client_socket, buffer, sizeof(buffer));
+    if(client_socket > *from_p){
+      select(client_socket + 1, &read_fds, NULL, NULL, NULL);
+    }
+    if(*from_p > client_socket){
+      select(*from_p + 1, &read_fds, NULL, NULL, NULL);
+    }
+    
+    if (FD_ISSET(client_socket, &read_fds)) {
+       read(client_socket, buffer, sizeof(buffer));
+       printf("[subserver %d] received: [%s]\n", getpid(), buffer);
+       process(to_p, from_p, buffer, state);
+       write(client_socket, buffer, sizeof(buffer));
+     }
+    if (FD_ISSET(*from_p, &read_fds)) {
+       read(*from_p, buffer, sizeof(buffer));
+       printf("[subserver %d] received: [%s] from another subserver\n", getpid(), buffer);
+       process(to_p, from_p, buffer, state);//obviously change
+       write(*to_p, buffer, sizeof(buffer));
+     }
   }//end read loop
   write(client_socket, "Goodbye", sizeof("Goodbye"));
   close(client_socket);
+  write(*from_p, "User has disconnected", sizeof("User has disconnected"));
+  close(*from_p);
   exit(0);
 }
 
@@ -54,26 +87,24 @@ void process(int * to_p, int * from_p, char * str, char * state) {
     strcpy(state, "");
     
   }
-  else if(strcmp(state, "hosting") == 0){
-    //host(to_p, from_p, str, state);
+  else if(strcmp(state, "in game") == 0){
+    nothost(to_p, from_p, str, state);
+  }
+  else if(strncmp(state, "hosting ", 8) == 0){
+    host(to_p, from_p, str, state);
   }
   else if(strcmp(state, "g1") == 0){
     game1(str, state);
   }
   else if(strcmp(str, "test") == 0){
-    strcpy(str, "entering test");
-    strcpy(state, "g1");
+    strcpy(str, state);
   }
   else if(strcmp(str, "host g1") == 0){
-    strcpy(str, "hosting");
-    strcpy(state, "hosting");
-    host(to_p, from_p, str, state);
+    strcpy(str, "hosting, type anything to procede");
+    strcpy(state, "hosting g1");
   }
   else if(strncmp(str, "join ", 5) == 0){
-    strcpy(str, "sdsar"); // ????
-    sscanf(str, "%d", to_p);
-    printf("%d\n",*to_p); 
-    sprintf(str, "fs %d", *to_p);
+    str += 5;// still has join back on the client message
     nothost(to_p, from_p, str, state);
   }
   else{
@@ -82,26 +113,36 @@ void process(int * to_p, int * from_p, char * str, char * state) {
 }
 
 void host(int * to_client, int * from_client, char * buffer, char * state ){
-  //shared memory and host list stuff goes here use state to see what you have to do
-
-  char wkp[25];
-  sprintf(wkp, "%d", getpid());
-  //no while loop here 
-  *from_client = server_handshake(to_client , wkp); // stays here if the server is invalid?
-  //change later
-  read(*from_client, buffer, sizeof(buffer));
-  write(*to_client, buffer, sizeof(buffer));
-  printf("buffer: %s\n", buffer);
+  if(strcmp(state, "h in game") != 0){
+    //shared memory and host list stuff goes here use state to see what you have to do
+    
+    char wkp[25];
+    sprintf(wkp, "%d", getpid()); 
+    *from_client = server_handshake(to_client , wkp); //note blocks here
+    state += 8; 
+    strcpy(buffer, "Game established");
+  }
   
   
 }
 
 void nothost(int * to_server, int * from_server, char * buffer, char * state ){
-  *from_server = client_handshake( to_server, buffer);
+  if(strcmp(state, "in game") != 0){
+  //check the buffer against the host
 
-  write(*to_server, buffer, sizeof(buffer));
-  read(*from_server, buffer, sizeof(buffer));
-  printf("buffer: %s\n", buffer);
+  //chance for bug if two people try to join at the same time(probably do
+  //something with how much you down the sempaphore for reading in this specific
+  // case
+    *from_server = client_handshake( to_server, buffer);
+    strcpy(state, "in game");
+    strcpy(buffer, "Sucessfuly joined game");
+  }
+  else{
+    printf("%s", state);
+    write(*to_server, buffer, sizeof(buffer));
+    read(*from_server, buffer, sizeof(buffer));
+    printf("buffer: %s\n", buffer);
+  }
 
 }
 
