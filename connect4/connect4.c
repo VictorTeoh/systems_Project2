@@ -20,7 +20,7 @@ int main(){
 	  break;
 	printf("Please enter an unfilled column!\nPick a column: ");
       }
-      turn(board, buffer[0] - '0', player);
+      turn(board, buffer[0] - '0' - 1, player);
     }
     printf("=====================================================\n");
     printf("=====================================================\n");
@@ -29,19 +29,16 @@ int main(){
     else //2p game
       printf("The game is over! Player %c won the game!\n", get_player(board));
     print_board(board);
-
-    
     //play again
     printf("Play again(y or n): ");
     fgets(buffer, 8, stdin);
-    while(strcmp(buffer,"y") || strcmp(buffer,"n")){
+    while(!(strlen(buffer) == 2 && (!strncmp(buffer,"y",1) || !strncmp(buffer,"n",1)))){
       printf("Please enter a valid answer!");
       printf("Play again(y or n): ");
       fgets(buffer, 8, stdin);
     }
-    if(strcmp(buffer,"n"))
+    if(!strncmp(buffer,"n",1))
       break;
-    
   }  
 
 }
