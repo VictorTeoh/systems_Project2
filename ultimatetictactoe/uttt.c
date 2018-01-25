@@ -7,6 +7,7 @@ int main(){
     bigsquare * board = Bigsquare();
     int curr_index = 0, next_index = 0;
     char player;
+    char buffer[8];
 
     //run game
     while(!is_over(board)){
@@ -35,17 +36,17 @@ int main(){
       printf("The game is over! Player %c won the game!\n", s_get_winner(get_bboard(board)));
     print_board(board);
 
-    /*
+    
     //play again
     printf("Play again(y or n): ");
-    ans = s.next();
-    while(!(ans.equals("y") || ans.equals("n"))){
-    printf"Please enter a valid answer!");
-    printf("Play again(y or n): ");
-    ans = s.next();
+    fgets(buffer, 8, stdin);
+    while(strcmp(buffer,"y") || strcmp(buffer,"n")){
+      printf("Please enter a valid answer!");
+      printf("Play again(y or n): ");
+      fgets(buffer, 8, stdin);
     }
-    if(ans.equals("n"))
-    break;
-    */
+    if(strcmp(buffer,"n"))
+      break;
+    
   }  
 }
