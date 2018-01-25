@@ -2,8 +2,8 @@
 
 connect4 * setup(){
   connect4 * cf = malloc(sizeof(connect4));
-  for(int i = 0; i < 6; i++)
-    for(int j = 0; j < 7; j++)
+  for(int i = 0; i < 7; i++)
+    for(int j = 0; j < 6; j++)
       (*cf)._board[i][j] = blank;
   (*cf)._turn = 0;
   (*cf)._isover = false;
@@ -11,8 +11,12 @@ connect4 * setup(){
   return cf;
 }
 
-char *** get_board(connect4 * cf){
-  return (*cf)._board;
+int is_over(connect4 * cf){
+  return (*cf)._isover;
+}
+
+char get_winner(connect4 * cf){
+  return (*cf)._winner;
 }
 
 char get_player(connect4 * cf){
@@ -23,16 +27,14 @@ char get_player(connect4 * cf){
     return p2;
 }
 
-char set(int col, int row, char player){
+char set(connect4 * cf, int col, int row, char player){
   return (*cf)._board[col][row] = player;
 }
 
 char turn(connect4 * cf, int col, char player){
-  printf("Current Board\n");
-  print_board(cf);
   char buffer[8];
-  char row;
-  while ((row = strchr((*cf)._board[col], blank)) == -1){
+  char * row;
+  while ((row = strchr((*cf)._board[col], blank)) == NULL){
     printf("Please enter an unfilled column!\nPick a column: ");
     while( fgets(buffer, 8, stdin) ){
       if(strlen(buffer) == 2 && ((buffer[0] - '0') <= 7 && (buffer[0] - '0') > 0))
@@ -41,20 +43,42 @@ char turn(connect4 * cf, int col, char player){
     }
     col = buffer[0] - '0';
   }
-  return set(col, row, player);
+  if(check_win(cf, col, row-(*cf)._board[col], player))
+    (*cf)._isover = true;
+  return set(cf, col, row-(*cf)._board[col], player);
+}
+
+int check_win(connect4 * cf, int col, int row, char player){
+  int i;
+  for(i = 0; i < 4; i++){
+    if((*cf)._board[col-i][row] == (*cf)._board[col+1-i][row] == (*cf)._board[col+2-i][row] == (*cf)._board[col+3-i][row]) //check horizontally
+      return (*cf)._winner = player;
+    if((*cf)._board[col][row-i] == (*cf)._board[col][row+1-i] == (*cf)._board[col][row+2-i] == (*cf)._board[col][row+3-i]) //check vertically
+      return (*cf)._winner = player; 
+    if((*cf)._board[col-i][row-i] == (*cf)._board[col+1-i][row+1-i] == (*cf)._board[col+2-i][row+2-i] == (*cf)._board[col+3-i][row+3-i]) //check a diagonal
+      return (*cf)._winner = player;
+    if((*cf)._board[col-i][row-i] == (*cf)._board[col-1-i][row-1-i] == (*cf)._board[col-2-i][row-2-i] == (*cf)._board[col-3-i][row-3-i]) //check other diagonal
+      return (*cf)._winner = player;
+  }
+  for( i=0; i<7; i++ )
+    if( strchr((*cf)._board[i], blank) )
+      return false;
+  return (*cf)._isover = true;
 }
 
 void print_board(connect4 * cf){
   char ans[512] = {"|"};
-  char open[16] = {" "};
-  for(int i = 0; i < 6; i++){
-    for(int j = 0; j < 7; j++)
-      sprintf(ans, "%s%s|", ans, (*cf)._board[i][j]);
-    sprintf(ans, "%s\n_______________\n", ans);
-    if(strchr((*cf)._board[i], blank) == -1)
-      sprintf(open, "%s%d ", ans, i);
-    else
-      sprintf(open, "%s  ", ans);
+  char open[32] = {""};
+  for(int i = 6; i > 0; i--){
+    for(int j = 7; j > 0; j--)
+      sprintf(ans, "%s %c |", ans, (*cf)._board[j][i]);
+    sprintf(ans, "%s\n-----------------------------\n|", ans);
   }
-  printf("%s\n",ans);
+  for(int i = 0; i < 7; i++){
+    if(strchr((*cf)._board[i], blank))
+      sprintf(open, "%s %d |", open, i+1);
+    else
+    sprintf(open, "%s   |", open);
+  }
+  printf("%s%s\n",ans,open);
 }
