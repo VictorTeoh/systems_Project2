@@ -40,13 +40,12 @@ int main(){
     //play again
     printf("Play again(y or n): ");
     fgets(buffer, 8, stdin);
-    while(strcmp(buffer,"y") || strcmp(buffer,"n")){
+    while(!(strlen(buffer) == 2 && (!strncmp(buffer,"y",1) || !strncmp(buffer,"n",1)))){
       printf("Please enter a valid answer!");
       printf("Play again(y or n): ");
       fgets(buffer, 8, stdin);
     }
-    if(strcmp(buffer,"n"))
-      break;
-    
+    if(!strncmp(buffer,"n",1))
+      break;    
   }  
 }

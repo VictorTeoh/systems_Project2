@@ -75,6 +75,10 @@ char check_win(connect4 * cf, int col, int row, char player){
     for (j = 3; j<6; j++)
       if ((*cf)._board[i][j] == (*cf)._board[i-1][j-1] && (*cf)._board[i-2][j-2] == (*cf)._board[i-3][j-3] && (*cf)._board[i][j] == player && (*cf)._board[i][j] == (*cf)._board[i-3][j-3])
 	return player;
+  for(i = 0; i < 7; i++)
+    if((*cf)._board[i][5] == blank)
+      return blank;
+  (*cf)._isover = true;
   return blank;
 }
 

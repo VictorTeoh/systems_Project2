@@ -24,10 +24,12 @@ int main(){
     }
     printf("=====================================================\n");
     printf("=====================================================\n");
-    if(get_player(board) == ' ')
+    if(get_winner(board) == ' ')
       printf("The game is over! You tied!\n");
-    else //2p game
-      printf("The game is over! Player %c won the game!\n", get_player(board));
+    else if( get_winner(board) == p1 ) //2p game
+      printf("The game is over! The Red player won the game!\n");
+    else
+      printf("The game is over! The Yellow player won the game!\n");
     print_board(board);
     //play again
     printf("Play again(y or n): ");
