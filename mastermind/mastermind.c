@@ -1,91 +1,124 @@
 #include "mastermind.h"
 
-void makeCode(char secretCode[4][10])
-{
-    int i, randColor;
-    for(i=0; i<4; i++)  
-    {
-        randColor = 1 + rand() % 6;     //creates a number 
-        switch(randColor)       //converts number created to a string
-        {
-            case 1: strcpy(secretCode[i], "red");       break;
-            case 2: strcpy(secretCode[i], "yellow");    break;
-            case 3: strcpy(secretCode[i], "green");     break;
-            case 4: strcpy(secretCode[i], "blue");      break;
-            case 5: strcpy(secretCode[i], "white");     break;
-            case 6: strcpy(secretCode[i], "black");     break;
-        }
-    }   
-}
-
-void guess(char guessCode[4][10])
-{
-    printf("\nEnter your guess:\n");
-    for(int i=0; i<4; i++)
-        scanf("%s", guessCode[i]);  
-}
-
-void codeCheck(char secretCode[4][10], char guessCode[4][10], int *blackPeg, int *whitePeg)
-{
-    int i, j, checkSecret[4] = {1,1,1,1}, checkGuess[4] = {1,1,1,1};
-    *blackPeg = *whitePeg = 0;
-
-    for(i=0; i<4; i++)      //if secret and guess's position and color are same, blackpeg increases and mark "check"
-        if(strcmp(guessCode[i], secretCode[i]) == 0)   
-        {
-            ++*blackPeg;
-            checkSecret[i] = checkGuess[i] = 0;
-        }            
-
-    for(i=0; i<4; i++)
-        for(j=0; j<4; j++)       
-            if(strcmp(secretCode[i],guessCode[j]) == 0  &&  checkGuess[i]  &&  checkSecret[j]  &&  i != j)        
-            {// determines crushes and eliminates extra whitePegs 
-                ++*whitePeg;
-                checkSecret[j] = checkGuess[i] = 0;
-            }
-}
-
-void displayGuess(char guessCode[4][10], int blackPeg, int whitePeg)
-{   
-    int i;
-    printf("\nYour Guess\t\t\t\tYour Score\n");   
-    for(i=0; i<4; i++) 
-        printf("%s ", guessCode[i]); 
-    printf("\t\t");        
-    for(i=0; i<blackPeg; i++) 
-        printf("black ");
-    for(i=0; i<whitePeg; i++)
-        printf("white ");       
-    printf("\n\n");
-}
-
-int main()
-{
-    srand(time(NULL));
-    int i, option=1, blackPeg, whitePeg, wrongGuess;
-    char secretCode[4][10], guessCode[4][10];
-    while(1)
-    {
-        printf("MASTER MIND! \nPress 1 to start game \nPress any number to exit\n\n");
-        scanf("%d", &option);        
-        if(option == 1)
-        {
-            makeCode(secretCode);
-            for(wrongGuess=1; wrongGuess<=12; wrongGuess++)      //gives 12 rights to guess
-            {
-                guess(guessCode);
-                codeCheck(secretCode, guessCode, &blackPeg, &whitePeg);
-                displayGuess(guessCode, blackPeg, whitePeg);
-                if(blackPeg == 4)           //if player guess correct all, than the game finishes
-                {
-                    printf("You Win!\n\n\n\n");  break;
-                }
-            }
-        if(wrongGuess == 13)        //if player cannot guess correct colors in 12 rounds, he losts
-            printf("\nYou Lost!\nSecret Code: %s %s %s %s\n\n\n\n\n", secretCode[0], secretCode[1], secretCode[2], secretCode[3]);  
-        }
-        else
-            exit(1);
+int main(){
+  int red_peg, white_peg, turn;
+  char mastercode[GUESSES], codebreaker[GUESSES];
+  char player;
+  while(1){
+    for(turn=0; turn<MAX_GUESS; turn++){
+      get_player(turn, &player);
+      if(player == p1 && turn == 0)
+	make_code(mastercode);
+      else if(player == p1)
+	change_code(mastercode, codebreaker);
+      make_code(codebreaker);
+      check(mastercode, codebreaker, &red_peg, &white_peg);
+      print(codebreaker, red_peg, white_peg);
+      if(red_peg == GUESSES){
+	printf("The Code Breaker won!\n");
+	break;
+      }
     }
+    if(turn == MAX_GUESS){
+      printf("\nThe Code Maker won!\nMaster Code: ");
+      for(int i=0; i<GUESSES; i++) 
+	printf("%s ", add_color(find_col(mastercode[i])));
+    }
+    exit(1);
+  }
+}
+
+//--------------------------------------------------------------
+void get_player(int turn, char * player){
+  if(turn % 5 == 0)
+    *player = p1;
+  else
+    *player = p2;
+}
+
+void make_code(char code[GUESSES]){
+  int i;
+  for(i=0; i<GUESSES; i++){
+    printf("Pin #%d color:\n", i+1); 
+    guess(&code[i]);
+  }
+}
+
+void change_code(char mastercode[GUESSES], char codebreaker[GUESSES]){
+  int i;
+  char buffer[STRING] = {0};
+  printf("Current Code: ");
+  for(i=0; i<GUESSES; i++)
+    printf("%s ", add_color(find_col(mastercode[i]))); 
+  printf("\nLast Guess: ");
+  for(i=0; i<GUESSES; i++)
+    printf("%s ", add_color(find_col(codebreaker[i])));
+  while( strlen(buffer) != 2 || !(buffer[0]-'0' > 0 && buffer[0]-'0' < 5) ){
+    printf("\nPick one of the four pins to change: ");
+    fgets(buffer, STRING, stdin);
+  }
+  i = buffer[0]-'0';
+  printf("i: %d\n", i);
+  guess(&mastercode[i-1]);
+}
+      
+void guess(char * pin){
+  char buffer[STRING] = {0};
+  printf("Red(r) | Green(g) | Yellow(y) | Blue(b) | Purple(p) | White(w)\n");
+  while( strlen(buffer) != 2 || (find_col(buffer[0]) == 0) ){
+    printf("Pick a color: ");
+    fgets(buffer, STRING, stdin);
+  }
+  *pin = buffer[0];
+}
+
+int find_col(char guess){
+  if(guess == red)       return 1;
+  if(guess == green)     return 2;
+  if(guess == yellow)    return 3;
+  if(guess == blue)      return 4;
+  if(guess == purple)    return 5;
+  if(guess == white)     return 6;
+  return 0;
+}
+
+char * add_color(int guess){
+  char * tmp = (char *)malloc(20*sizeof(char));
+  if(guess == 1)     sprintf(tmp, RED "red" RST);
+  if(guess == 2)     sprintf(tmp, GRN "green" RST);
+  if(guess == 3)     sprintf(tmp, YEL "yellow" RST);
+  if(guess == 4)     sprintf(tmp, BLU "blue" RST);
+  if(guess == 5)     sprintf(tmp, PUR "purple" RST);
+  if(guess == 6)     sprintf(tmp, WHT "white" RST);
+  return tmp;
+}
+
+void check(char mastercode[GUESSES], char codebreaker[GUESSES], int * red_peg, int * white_peg){
+  int i, j;
+  int master[GUESSES] = {1,1,1,1};
+  int breaker[GUESSES] = {1,1,1,1};
+  *red_peg = *white_peg = 0;
+
+  for(i=0; i<GUESSES; i++)
+    if(strncmp(codebreaker+i, mastercode+i, 1) == 0){
+      ++*red_peg;
+      master[i] = breaker[i] = 0;
+    }            
+  
+  for(i=0; i<GUESSES; i++)
+    for(j=0; j<GUESSES; j++)       
+      if(strncmp(mastercode+i,codebreaker+j, 1) == 0 && breaker[i] && master[j] && i != j){
+	++*white_peg;
+	master[j] = breaker[i] = 0;
+      }
+}
+
+void print(char codebreaker[GUESSES], int red_peg, int white_peg){   
+  int i;
+  printf("Your Guess: ");   
+  for(i=0; i<GUESSES; i++) 
+    printf("%s ", add_color(find_col(codebreaker[i])));
+  printf("\n\nYou have %d correctly colored and positioned pins!", red_peg);
+  printf("\nYou have %d correctly colored but misplaced pins!\n", white_peg);       
+  printf("==========================================================\n");
 }
